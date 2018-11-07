@@ -2,14 +2,16 @@ window.onload = main;
 
 
 var blank = ["300px", "300px"];
+var start = false
 var starting_time = 0;
 var timer;
 var total_time = 0;
 var best_time = 0;
 var best_moves = 0;
+var moves = 0;
 
 
-function Starting() {
+function starting() {
     var puzzleplace = document.getElementById("puzzlearea").childNodes;
     var starter = [];
 
@@ -20,10 +22,10 @@ function Starting() {
         counter = 1;
 
     for (let i = 0; i <puzzleplace.length; i++) {
-        if (puzzle_area[i].nodeName == "DIV") {
+        if (puzzleplace[i].nodeName == "DIV") {
             starter.push([t.toString() + "px", r.toString() + "px"]);
            puzzleplace[i].className += "puzzlepiece";
-           puzzleplace[i].setAttribute("style", `background-position: ${a}px ${x}px; t: ${t}px; r: ${r}px;`);
+           puzzleplace[i].setAttribute("style", `background-position: ${a}px ${x}px; top: ${t}px; left: ${r}px;`);
             a -= 100;
             r += 100;
 
@@ -58,7 +60,7 @@ function wincheck(winning, piece) {
     return false;
 }
 
-function move_piece(piece, animate) {
+function movepiece(piece, animate) {
     blankTop = piece.style.t;
     blankLeft = piece.style.r;
 
@@ -84,4 +86,77 @@ function move_piece(piece, animate) {
         piece.style.r = blank[1];
     }
     blank = [blankTop, blankLeft];
+}
+
+function randomShuffle(pieces) {
+    var piece_Length = pieces.length;
+    var piece;
+    var randoms;
+
+    controls.addEventListener("click", function() {
+      for (var index = 0; index < piece_Length; index++) {
+          randoms = Math.floor(Math.random() * pieces.length);
+          piece = pieces.splice(randoms, 1);
+          movepiece(piece[0], false);
+      }
+    });
+}
+
+
+function getPieces() {
+    return $ (".puzzlepiece");
+}
+
+function time(seconds) {
+    var date = new Date(null);
+    date.setSeconds(seconds);
+    return date.toISOString().substr(11, 8);
+}
+
+
+function updateTime() {
+    var currentDate = new Date();
+    var currentTime = (currentDate.getHours() * 60 * 60) + (currentDate.getMinutes() * 60) + currentDate.getSeconds();
+    totalTime = currentTime - starting_time;
+    return time(totalTime);
+}
+
+function updateStatus() {
+    $(".explanation")[0].innerHTML = `Time: ${updateTime()} Moves: ${moves}`;
+}
+
+function main() {
+    var winning_state = starting();
+    var puzzlePieces = getPieces();
+
+
+    document.getElementById("shufflebutton").onclick = function() {
+        randomShuffle(puzzlePieces);
+        start = true;
+        moves = 0;
+        puzzlePieces = getPieces();
+        var startDate = new Date();
+        starting_time = (startDate.getHours() * 60 * 60) + (startDate.getMinutes() * 60) + startDate.getSeconds();
+        timer = setInterval(updateStatus, 1000);
+    }
+
+    for (var i = 0; i < puzzlePieces.length; i++) {
+        puzzlePieces[i].addEventListener("mouseover", function() {
+            if (movable(this)) {
+                this.className = "puzzlepiece movablepiece";
+            }
+        });
+
+        puzzlePieces[i].addEventListener("mouseleave", function() {
+            this.className = "puzzlepiece";
+        });
+
+        puzzlePieces[i].addEventListener("click", function() {
+            if (this.className.includes("movablepiece")) {
+                movepiece(this, true, winning_state, puzzlePieces);
+                moves++;
+            }
+        });
+    }
+
 }
