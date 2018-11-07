@@ -88,18 +88,17 @@ function movepiece(piece, animate) {
     blank = [blankTop, blankLeft];
 }
 
-function randomShuffle(pieces) {
-    var piece_Length = pieces.length;
-    var piece;
-    var randoms;
 
-    controls.addEventListener("click", function() {
-      for (var index = 0; index < piece_Length; index++) {
-          randoms = Math.floor(Math.random() * pieces.length);
-          piece = pieces.splice(randoms, 1);
-          movepiece(piece[0], false);
-      }
-    });
+function random_shuffle(pieces) {
+    var pieceLength = pieces.length;
+    var piece;
+    var rand;
+
+    for (var index = 0; index < pieceLength; index++) {
+        rand = Math.floor(Math.random() * pieceLength);
+        piece = pieces.splice(rand, 1);
+        movepiece(piece[0], false);
+    }
 }
 
 
